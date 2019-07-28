@@ -1,2 +1,3 @@
 <label>Hello World!</label>
-<pre><? print_r($p) ?></pre>
+<pre><? print_r($model) ?></pre>
+

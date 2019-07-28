@@ -119,5 +119,16 @@ class Page {
     public function render($params) {
         die('Method not implemented!');
     }
+
+    final public function renderView($model){
+        // echo __CLASS__;
+        $dir = dirname((new ReflectionClass($this))->getFileName());
+        $class = get_class($this);
+         wrapInclude(("$dir/$class.view.php"), $model);
+    }
+}
+
+function wrapInclude($path, $model){
+    include $path;
 }
 ?>
