@@ -6,9 +6,11 @@ if (!defined('__pages')) {
 }
 interface IAppHandler
 {
-    public function on_app_created($app);
-    public function render_header();
-    public function render_footer();
+    public function OnAppCreated($app);
+    public function RenderHeader();
+    public function RenderFooter();
+    public function OnPageRendering($page);
+
 }
 
 class App
@@ -57,7 +59,7 @@ class App
         $this->params = array_merge($url, $get);
         if ($handler != null) {
             $this->handler = $handler;
-            $handler->on_app_created($this);
+            $handler->OnAppCreated($this);
         }
     }
     public function run()
@@ -76,7 +78,7 @@ class App
             //Turn on output buffering
             ob_start();
             if ($this->handler != null) {
-                $this->handler->render_header();
+                $this->handler->RenderHeader();
             }
 
             // include the file in our system
@@ -85,12 +87,16 @@ class App
                 $theClass = new $this->page;
                 //if (method_exists($theClass, "render")) {
                 if ($theClass instanceof Page) {
-                    $theClass->render($this->params);
-                } else {
-                //Clean (erase) the output buffer and turn off output buffering
-                ob_end_clean();
-                die("{$this->page} has not instance of Page class!");
+                    if ($this->handler != null) {
+                        $this->handler->OnPageRendering($theClass);
+                    }
+                        $theClass->render($this->params);
 
+
+                } else {
+                    //Clean (erase) the output buffer and turn off output buffering
+                    ob_end_clean();
+                    die("{$this->page} has not instance of Page class!");
                 }
             } else {
                 //Clean (erase) the output buffer and turn off output buffering
@@ -98,7 +104,7 @@ class App
                 die("{$this->page}.php does not have named class!");
             }
             if ($this->handler != null) {
-                $this->handler->render_footer();
+                $this->handler->RenderFooter();
             }
 
             //Get current buffer contents and delete current output buffer
@@ -112,23 +118,28 @@ class App
         //     exit("Directory {$this->path} is not exists!");
         // }
     }
-
 }
 
-class Page {
-    public function render($params) {
+abstract class Page
+{
+
+    //public $allowRender;
+
+    public function render($params)
+    {
         die('Method not implemented!');
     }
 
-    final public function renderView($model){
+    final public function renderView($model)
+    {
         // echo __CLASS__;
         $dir = dirname((new ReflectionClass($this))->getFileName());
         $class = get_class($this);
-         wrapInclude(("$dir/$class.view.php"), $model);
+        wrapInclude(("$dir/$class.view.php"), $model);
     }
 }
 
-function wrapInclude($path, $model){
+function wrapInclude($path, $model)
+{
     include $path;
 }
-?>
