@@ -5,7 +5,7 @@ PHP - MVP - Passive View
 
 ## rewrite config for ngnix (same as wordpress)
 
-```json
+```nginx
 location / {
 			try_files $uri $uri/ /index.php?$args;
 			
