@@ -31,3 +31,20 @@ location / {
 		}
 ```
 
+## rewrite config for apache
+```htaccess
+
+
+# BEGIN WordPress
+
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php?q=$1 [NC,L,QSA]
+
+
+# END WordPress
+
+```
